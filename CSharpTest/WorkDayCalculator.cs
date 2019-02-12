@@ -10,45 +10,40 @@ namespace CSharpTest
     {
         public DateTime Calculate(DateTime startDate, int dayCount, WeekEnd[] weekEnds)
         {
-           
-            
-            if (dayCount <= 0)
-            {
-                return startDate;
-            }
-            if (weekEnds == null)
+            if (weekEnds == null) // Checking that array "weekEnds" is initialized for TestNoWeekEnd
             {
                 return startDate.AddDays(dayCount - 1);
             }
 
-            int weekend_index = 0; // variable that store number of next weekend in array 
+            if (weekEnds.Length==0) //Checking that we have weekends
+            {
+                return startDate.AddDays(dayCount - 1);
+            }
+
+            int weekend_index = 0; 
+
             while (dayCount > 0)
             {
-                if (weekend_index >= weekEnds.Length) // if there are no weekends ,just adding dayCount
+                if(weekend_index>=weekEnds.Length) //Checking that we still have weekends
                 {
-                    startDate=startDate.AddDays(dayCount - 1);
-                    dayCount = 0;
+                    return startDate.AddDays(dayCount - 1);
                 }
-                else // if we have weekends , just
+                if (weekEnds[weekend_index] != default(WeekEnd) && weekEnds[weekend_index].StartDate.DayOfYear >= startDate.DayOfYear) // Сhecking that the variable is initialized and the next weekend in the future or now
                 {
-                    if (weekEnds[weekend_index] != default(WeekEnd) && weekEnds[weekend_index].StartDate.DayOfYear >= startDate.DayOfYear) // checking that variable is initialized and adecuate
+                    if (dayCount > weekEnds[weekend_index].StartDate.DayOfYear - startDate.DayOfYear) // Checking that we need the next weekend
                     {
-
-                        if (dayCount > weekEnds[weekend_index].StartDate.DayOfYear - startDate.DayOfYear)
-                        {
-
-                            dayCount -= weekEnds[weekend_index].StartDate.DayOfYear - startDate.DayOfYear;
-                            startDate = weekEnds[weekend_index].EndDate.AddDays(1);
-                        }
-                        else
-                        {
-                            startDate=startDate.AddDays(dayCount - 1);
-                            dayCount = 0;
-                        }
+                        dayCount -= weekEnds[weekend_index].StartDate.DayOfYear - startDate.DayOfYear;
+                        startDate = weekEnds[weekend_index].EndDate.AddDays(1);
                     }
-                    ++weekend_index;
+                    else
+                    {
+                        startDate=startDate.AddDays(dayCount - 1);
+                        dayCount = 0;
+                    }
                 }
+                ++weekend_index;
             }
+
             return startDate;
         }
     }
